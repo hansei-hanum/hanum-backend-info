@@ -1,15 +1,15 @@
-from fastapi import APIRouter, Depends
-from depends import RequireAuth
-from neis import TimeTable
-from fastapi import HTTPException
-from micro import auth
+from fastapi import APIRouter, Depends, HTTPException
 
-router = APIRouter()
+from core.auth.client import get_user
+from core.neis.time_table import TimeTable
+from depends.require_auth import RequireAuth
+
+router = APIRouter(prefix="/timetable")
 
 
 @router.get("/")
 async def get_timetable(userid: int = Depends(RequireAuth)):
-    user = await auth.get_user(userid)
+    user = await get_user(userid)
 
     if not user:
         raise HTTPException(status_code=404, detail="USER_NOT_FOUND")

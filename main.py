@@ -1,9 +1,8 @@
 from fastapi import FastAPI
-from routes import include_router
-from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import JSONResponse
-from neis import Meal
-import time
+from starlette.exceptions import HTTPException as StarletteHTTPException
+
+from routes import include_router
 
 app = FastAPI()
 
@@ -25,4 +24,4 @@ include_router(app)
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(app, port=8080)
+    uvicorn.run("main:app", port=8080, reload=True)

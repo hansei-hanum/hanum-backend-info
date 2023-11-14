@@ -1,20 +1,22 @@
 from fastapi import Header
-from micro import auth
 from fastapi.exceptions import HTTPException
 from grpc.aio._call import AioRpcError
+
+from core.auth.client import authorize
 
 
 async def RequireAuth(authorization: str = Header(...)):
     try:
-        token_type = authorization.split(" ")[0]
-        token = authorization.split(" ")[1]
+        token_type, token = authorization.split(" ")
 
-        if token_type != "Bearer":
+        if token_type.lower() != "bearer":
             raise
 
-        userid = await auth.authorize(token)
+        userid = await authorize(token)
+
         if not userid:
             raise
+
         return userid
     except AioRpcError:
         raise HTTPException(status_code=500, detail="INTERNAL_COMMUNICATION_ERROR")

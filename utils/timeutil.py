@@ -44,7 +44,6 @@ async def month_range(month: int = None):
 
     if month == 12:
         end_date = datetime.date(today.year + 1, 1, 1) - datetime.timedelta(days=1)
-
     else:
         end_date = datetime.date(today.year, month + 1, 1) - datetime.timedelta(days=1)
 
