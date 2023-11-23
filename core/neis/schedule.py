@@ -29,7 +29,7 @@ class ScheduleItem(BaseModel):
 
 class Schedule:
     @staticmethod
-    @cached(ttl=86400, cache=Cache.MEMORY, serializer=PickleSerializer())
+    @cached(ttl=3600, cache=Cache.MEMORY, serializer=PickleSerializer())
     async def fetch(start: date, end: date) -> list[ScheduleItem]:
         async with ClientSession() as session:
             response = await session.get(
