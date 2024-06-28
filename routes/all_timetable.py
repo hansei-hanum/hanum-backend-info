@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi.params import Param
 
 from core.auth.client import get_user
 from core.neis.time_table import TimeTable
@@ -6,7 +7,7 @@ from depends.require_auth import RequireAuth
 
 from pydantic import BaseModel
 
-router = APIRouter(prefix="/timetable/teacher")
+router = APIRouter(prefix="/timetable")
 
 class TimetableDTO(BaseModel):
     department: str
@@ -14,7 +15,12 @@ class TimetableDTO(BaseModel):
     class_num: int
 
 @router.get("/")
-async def teacher_timetable(data: TimetableDTO, userid: int = Depends(RequireAuth)):
+async def teacher_timetable(
+    department: str = Param(...),
+    grade:int = Param(...),
+    classroom:int = Param(...),
+    userid: int = Depends(RequireAuth)
+    ):
     user = await get_user(userid)
 
     if not user:
@@ -24,9 +30,9 @@ async def teacher_timetable(data: TimetableDTO, userid: int = Depends(RequireAut
         raise HTTPException(status_code=403, detail="UNAUTHORIZED")
 
     timetable = await TimeTable.get(
-        data.department,
-        data.grade,
-        data.class_num,
+        department,
+        grade,
+        classroom,
     )
 
     if not timetable:
