@@ -5,6 +5,8 @@ from aiocache import Cache, cached
 from aiocache.serializers import PickleSerializer
 from aiohttp import ClientSession
 from pydantic import BaseModel, Field
+import certifi
+import ssl
 
 from env import NeisEnv
 from utils import timeutil
@@ -35,10 +37,13 @@ class TimeTable:
     ) -> list[TimeTableItem]:
         if department not in DEPARTMANT_BINDING:
             return None
+        
+        ssl_context = ssl.create_default_context(cafile=certifi.where())
 
         async with ClientSession() as session:
             response = await session.get(
                 "https://open.neis.go.kr/hub/hisTimetable",
+                ssl=ssl_context,
                 params={
                     "KEY": NeisEnv.API_KEY,
                     "Type": "json",
@@ -82,7 +87,10 @@ class TimeTable:
     @staticmethod
     async def get(department: str, grade: int, classroom: int) -> list[TimeTableItem]:
         start_date, end_date = await timeutil.timetable_range()
-
+        
+        if department not in DEPARTMANT_BINDING:
+            raise ValueError("INVALID_DEPARTMENT")
+        
         return await TimeTable.fetch(
             department=department,
             grade=grade,
